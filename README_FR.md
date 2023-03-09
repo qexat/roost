@@ -6,10 +6,18 @@ C'est un simple script que j'ai écrit en genre 2 heures donc ne vous attendez p
 
 ## Usage
 
+### Compiler
+
+```
+cargo build --release
+```
+
+### Exécuter
+
 Dans l'émulateur de terminal, écrivez :
 
 ```
-python3 -m src.roost
+./target/release/roost
 ```
 
 Ensuite, remplissez les champs ; le message d'erreur sera affiché à la fin.
@@ -21,7 +29,7 @@ Vous pouvez écrire le message d'erreur (avec les séquences d'échappement ANSI
 Pour ce faire, vous avez simplement à fournir un chemin de fichier valide après l'argument, tel que :
 
 ```
-python3 -m src.roost --output /chemin/vers/mon_fichier.txt
+./target/release/roost --output /chemin/vers/mon_fichier.txt
 ```
 
 ## Capture d'écran

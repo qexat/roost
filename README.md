@@ -8,10 +8,18 @@ It's a simple script I've written in like 2 hours so don't expect the code quali
 
 ## Usage
 
+### Build
+
+```
+cargo build --release
+```
+
+### Run
+
 In the terminal emulator, type:
 
 ```
-python3 -m src.roost
+./target/release/roost
 ```
 
 Then, fill the fields ; it will print the error message at the end.
@@ -23,7 +31,7 @@ You can write the error message (with the ANSI escape sequences) into a file.
 To do so, you simply need to provide a valid file path after the argument, such as:
 
 ```
-python3 -m src.roost --output /path/to/my_file.txt
+./target/release/roost --output /path/to/my_file.txt
 ```
 
 ## Screenshot
