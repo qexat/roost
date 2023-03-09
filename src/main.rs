@@ -83,7 +83,7 @@ impl ErrorData {
                 color("--> ".to_owned(), 4),
                 self.path,
                 self.lineno,
-                self.spos
+                self.spos + 1,
             )
             .chars(),
         );
