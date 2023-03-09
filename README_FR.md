@@ -18,7 +18,7 @@ Ensuite, remplissez les champs ; le message d'erreur sera affiché à la fin.
 
 Vous pouvez écrire le message d'erreur (avec les séquences d'échappement ANSI) dans un fichier.
 
-Pour ce faire, vous avez simplement à fournir un chemin de fichier valid après l'argument, tel que :
+Pour ce faire, vous avez simplement à fournir un chemin de fichier valide après l'argument, tel que :
 
 ```
 python3 -m src.roost --output /chemin/vers/mon_fichier.txt
