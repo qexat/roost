@@ -26,4 +26,4 @@ python3 -m src.roost --output /chemin/vers/mon_fichier.txt
 
 ## Capture d'écran
 
-![example.png](./images/example.png)
+![example_fr.png](./images/example_fr.png)
