@@ -6,7 +6,7 @@ It's a simple script I've written in like 2 hours so don't expect the code quali
 
 ## Usage
 
-In the terminal, type:
+In the terminal emulator, type:
 
 ```
 python3 -m src.roost
