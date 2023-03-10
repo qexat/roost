@@ -129,7 +129,7 @@ fn make_prompt(name: String, default: Option<Box<dyn ToString>>) -> String {
 
 fn field<T, F>(name: &str, field_type: &mut F, default: Option<T>) -> T
 where
-    T: ToString + 'static + fmt::Display + Clone,
+    T: fmt::Display + 'static + Clone,
     F: Fn(String) -> Result<T, RoostError> + ?Sized,
 {
     let prompt = make_prompt(
