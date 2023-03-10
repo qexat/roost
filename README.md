@@ -2,7 +2,7 @@
 
 > Do you speak baguette? Read the [fronch version](./README_FR.md)!
 
-Roost is a Rust error generator written in Python. It is meant to be used for jokes.
+Roost is a Rust error generator written in ~~Python~~ Rust. It is meant to be used for jokes.
 
 It's a simple script I've written in like 2 hours so don't expect the code quality to be good 😆.
 

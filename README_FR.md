@@ -1,6 +1,6 @@
 # Roost
 
-Roost est un générateur d'erreurs de Rust écrit en Python. C'est pour faire des blagues.
+Roost est un générateur d'erreurs de Rust écrit en ~~Python~~ Rust, voyons ! C'est pour faire des blagues.
 
 C'est un simple script que j'ai écrit en genre 2 heures donc ne vous attendez pas à ce que la qualité du code soit bonne 😆.
 
