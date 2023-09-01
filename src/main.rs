@@ -105,8 +105,8 @@ impl ErrorData {
     }
 }
 
-fn string(string: String) -> Result<String, RoostError> {
-    Ok(string)
+fn string(string: &str) -> Result<String, RoostError> {
+    Ok(string.to_string())
 }
 
 fn bold(string: String) -> String {
@@ -117,41 +117,35 @@ fn color(string: String, code: u8) -> String {
     format!("\x1b[3{}m{}\x1b[39m", code, string)
 }
 
-fn make_prompt(name: String, default: Option<Box<dyn ToString>>) -> String {
+fn make_prompt(name: String, default: Option<String>) -> String {
     let mut prompt = name;
 
-    if default.is_some() {
-        prompt.extend(color(format!(" (default={})", default.unwrap().to_string()), 4).chars());
+    if let Some(default_value) = default {
+        prompt.extend(color(format!(" (default={})", default_value), 4).chars());
     }
 
     return bold(format!("{}: ", prompt));
 }
 
-fn field<T, F>(name: &str, field_type: &mut F, default: Option<T>) -> T
+fn field<T, F>(name: &str, field_type: &F, default: Option<T>) -> T
 where
     T: fmt::Display + 'static + Clone,
-    F: Fn(String) -> Result<T, RoostError> + ?Sized,
+    F: Fn(&str) -> Result<T, RoostError>,
 {
-    let prompt = make_prompt(
-        name.to_owned(),
-        default.clone().map(|t| Box::new(t) as Box<dyn ToString>),
-    );
-
     loop {
+        let prompt = make_prompt(name.to_owned(), default.as_ref().map(|t| t.to_string()));
+
         print!("{}", prompt);
         io::stdout().flush().expect("could not flush stdout");
 
         let mut result = String::new();
         io::stdin().read_line(&mut result).expect("failed input");
 
-        result = result
-            .strip_suffix("\n")
-            .expect("no newline at end of input")
-            .to_string();
+        result = result.trim_end().to_string();
 
         if result.is_empty() {
-            if default.is_some() {
-                return default.unwrap();
+            if let Some(default) = &default {
+                return default.clone();
             }
             eprintln!(
                 "{}",
@@ -159,7 +153,7 @@ where
             );
         }
 
-        match field_type(result.clone()) {
+        match field_type(&result) {
             Ok(value) => return value,
             Err(_) => {
                 eprintln!(
@@ -174,35 +168,27 @@ where
     }
 }
 
-fn int_factory(
-    min_value: usize,
-    max_value: usize,
-) -> Box<dyn Fn(String) -> Result<usize, RoostError>> {
-    let inner = move |raw_value: String| {
-        let value = match raw_value.parse::<usize>() {
-            Ok(value) => value,
-            Err(_) => {
-                return Err(RoostError::ValueError {
-                    details: "invalid value".to_owned(),
-                })
-            }
-        };
+fn int_factory(min_value: usize, max_value: usize) -> impl Fn(&str) -> Result<usize, RoostError> {
+    move |raw_value: &str| {
+        let value = raw_value
+            .parse::<usize>()
+            .map_err(|_| RoostError::ValueError {
+                details: "invalid value".to_string(),
+            })?;
 
         if value < min_value {
             return Err(RoostError::ValueError {
-                details: "value is too smol".to_owned(),
+                details: "value is too smol".to_string(),
             });
-        };
+        }
         if value > max_value {
             return Err(RoostError::ValueError {
-                details: "value is too big".to_owned(),
+                details: "value is too big".to_string(),
             });
-        };
+        }
 
         Ok(value)
-    };
-
-    return Box::new(inner);
+    }
 }
 
 fn print_line_helper(line: String) {
@@ -211,11 +197,8 @@ fn print_line_helper(line: String) {
 
     println!("{}", "─".repeat(helper_len));
 
-    for i in 0..line.len() {
-        print!(
-            "{}",
-            format!("{i:^width$}", i = i, width = last_char_no_len)
-        );
+    for (i, _) in line.chars().enumerate() {
+        print!("{:^width$}", i, width = last_char_no_len);
     }
     println!();
 
@@ -228,37 +211,31 @@ fn print_line_helper(line: String) {
 }
 
 fn main() {
-    let args = Args::parse();
-    let mut output = match args.get_output() {
-        Ok(something) => something,
-        Err(_) => panic!("an unknown error occured"),
-    };
+    let mut output = Args::parse()
+        .get_output()
+        .unwrap_or_else(|_| panic!("An unknown error occurred"));
 
     let summary = field("summary", &mut string, None);
     let line: String = field("line", &mut string, None);
 
     print_line_helper(line.clone());
 
-    let spos = field(
-        "error start position",
-        int_factory(0, line.len()).as_mut(),
-        Some(0),
-    );
+    let spos = field("error start position", &int_factory(0, line.len()), Some(0));
     let epos = field(
         "error end position",
-        int_factory(spos + 1, line.len() - 1).as_mut(),
+        &int_factory(spos + 1, line.len() - 1),
         Some(line.len() - 1),
     ) + 1;
     let message = field("message", &mut string, None);
     let lineno = field(
         "line number",
-        int_factory(usize::MIN, usize::MAX).as_mut(),
+        &int_factory(usize::MIN, usize::MAX),
         Some(DEFAULT_LINENO),
     );
     let path = field("path", &mut string, Some(DEFAULT_PATH.to_owned()));
     let errnum = field(
         "error number",
-        int_factory(usize::MIN, usize::MAX).as_mut(),
+        &int_factory(usize::MIN, usize::MAX),
         Some(DEFAULT_ERRNUM),
     );
 
